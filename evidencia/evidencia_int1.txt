@@ -1,0 +1,90 @@
+EVIDENCIA INTEGRANTE 1 - Generador y formato del dataset binario
+=================================================================
+
+Fecha: 2026-09-14
+Clases: GestorDataset.java (LCG 64 bits, DataOutputStream + BufferedOutputStream,
+        cabecera, tamanio esperado, validacion de integridad, dataset de verificacion)
+
+1) GENERACION datos/datos.bin (entregable versionado)
+   Comando: java -cp src GestorDataset generar datos/datos.bin 1000 3 12345
+--------------------------------------------------------------
+Dataset generado en: datos/datos.bin
+  N = 1000   n = 3   rango = [0, 100.0)
+  tamanio esperado = 24008 bytes  (0.02289581298828125 MB)
+  tiempo = 4 ms
+
+2) VALIDACION datos/datos.bin (cabecera + integridad)
+   Comando: java -cp src GestorDataset info datos/datos.bin
+--------------------------------------------------------------
+N = 1000   n = 3
+tamanio real     = 24008 bytes
+tamanio esperado = 24008 bytes
+Archivo OK
+
+3) GENERACION + VALIDACION datos/datos_verificacion.bin (30 puntos, 2D, x=i, y=i*i)
+   Comando: java -cp src GestorDataset verificacion datos/datos_verificacion.bin
+   Comando: java -cp src GestorDataset info datos/datos_verificacion.bin
+--------------------------------------------------------------
+Dataset de verificacion (30 puntos, 2D) generado en: datos/datos_verificacion.bin
+  Punto[i] = (i, i*i)
+  Distancia minima esperada: P[0] a P[1] = sqrt(2) = 1.4142135623730951
+  Distancia maxima esperada: P[0] a P[29]
+N = 30   n = 2
+tamanio real     = 488 bytes
+tamanio esperado = 488 bytes
+Archivo OK
+
+4) CONTENIDO datos/datos_verificacion.bin (confirma y = i*i)
+   Comando: java -cp src GestorDataset ver datos/datos_verificacion.bin 0 5
+   Comando: java -cp src GestorDataset ver datos/datos_verificacion.bin 29
+--------------------------------------------------------------
+Punto[0] = 0.0, 0.0
+Punto[1] = 1.0, 1.0
+Punto[2] = 2.0, 4.0
+Punto[3] = 3.0, 9.0
+Punto[4] = 4.0, 16.0
+Punto[5] = 5.0, 25.0
+Punto[29] = 29.0, 841.0
+
+5) RANGO DE VALORES datos/datos.bin (rango = [0, 100))
+   Comando: java -cp src GestorDataset ver datos/datos.bin 0 3
+   Comando: java -cp src GestorDataset ver datos/datos.bin 998 999
+--------------------------------------------------------------
+Punto[0] = 10.957860598549463, 26.538529591773784, 88.56239926684798
+Punto[1] = 83.57374096797801, 32.56310617188104, 56.04722305634265
+Punto[2] = 79.3868435161561, 39.14938750663281, 81.51793567870766
+Punto[3] = 18.8168535782248, 98.99951327998888, 98.30571047624649
+Punto[998] = 63.127217972201045, 19.091566856365883, 43.25519850640012
+Punto[999] = 97.38842460949797, 58.3729245980027, 59.11976999835373
+
+6) HASHES MD5 (reproducibilidad entre integrantes)
+   Comando: certutil -hashfile datos/datos.bin MD5
+   Comando: certutil -hashfile datos/datos_verificacion.bin MD5
+--------------------------------------------------------------
+MD5 datos/datos.bin               = d1871098306f974ceabc3467527428bb
+MD5 datos/datos_verificacion.bin  = a6c04da15049a6ded0be4e8bd87dcb77
+
+Como comprobar: cada integrante genera su propio datos.bin con la misma
+semilla (java GestorDataset generar datos.bin 1000 3 12345) y ejecuta
+certutil -hashfile datos.bin MD5 (md5sum en Linux/Mac). Si el hash coincide
+con d1871098306f974ceabc3467527428bb, trabajan sobre el MISMO dataset.
+
+7) PRUEBA DE ARCHIVO CORRUPTO (validacion falla temprano)
+   Preparacion: copia truncada a 100 bytes de datos.bin en carpeta temporal
+   Comando: java -cp src GestorDataset info <tmp>/datos_corrupto.bin
+--------------------------------------------------------------
+N = 1000   n = 3
+tamanio real     = 100 bytes
+tamanio esperado = 24008 bytes
+Exception in thread "main" java.io.IOException: Archivo corrupto o
+incompleto: esperado 24008 bytes, real 100 bytes
+	at GestorDataset.validarArchivo(GestorDataset.java:107)
+	at GestorDataset.main(GestorDataset.java:177)
+
+El archivo corrupto no se versiona: es solo una prueba local.
+
+NOTAS
+-----
+- Reproducible: misma semilla + N + n + rango => mismo archivo byte a byte (LCG 64 bits).
+- Solo se versionan datos/datos.bin y datos/datos_verificacion.bin (.gitignore regla 4.1).
+- datos_N1000_n3.bin (Integrante 5) es el mismo contenido que datos.bin con otro nombre.
