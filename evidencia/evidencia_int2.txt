@@ -1,0 +1,106 @@
+EVIDENCIA INTEGRANTE 2 - Capa de E/S por bloques (LectorBloques)
+================================================================
+Fecha: 2026-09-15
+Clases: LectorBloques.java (descriptor por hilo, validacion en constructor,
+        lectura big-endian manual, buffers reutilizados, ultimo bloque parcial)
+        PruebaLector.java (main de depuracion y comparacion)
+JDK: java 17.0.17
+
+0) VERIFICACION OBLIGATORIA DEL DATASET (regla 1.12 del plan)
+   Comando: java -cp src GestorDataset generar datos/datos.bin 1000 3 12345
+   Comando: java -cp src GestorDataset info datos/datos.bin
+   Comando: certutil -hashfile datos/datos.bin MD5
+--------------------------------------------------------------
+N = 1000   n = 3
+tamanio real     = 24008 bytes
+tamanio esperado = 24008 bytes
+Archivo OK
+MD5 hash de datos\datos.bin:
+d1871098306f974ceabc3467527428bb
+CertUtil: -hashfile comando completado correctamente.
+MD5 esperado d1871098306f974ceabc3467527428bb -> OK (coincide)
+
+1) COMPILACION
+   Comando: javac -d src src/GestorDataset.java src/LectorBloques.java src/PruebaLector.java
+--------------------------------------------------------------
+Compilacion correcta (sin errores ni warnings).
+
+2) PruebaLector: BLOQUE NORMAL (bloque 0, 400 puntos/bloque)
+   Comando: java -cp src PruebaLector datos/datos.bin 0 400
+--------------------------------------------------------------
+=== LectorBloques: datos\datos.bin ===
+N = 1000  n = 3  puntosPorBloque = 400
+bloques totales = 3  bloque pedido = 0  puntos leidos = 400
+Punto[0] = 10.957860598549463, 26.538529591773784, 88.56239926684798
+Punto[1] = 83.57374096797801, 32.56310617188104, 56.04722305634265
+Punto[2] = 79.3868435161561, 39.14938750663281, 81.51793567870766
+Punto[399] = 43.1905039089742, 72.8371569289503, 4.162509053013952
+=== fin bloque 0 ===
+
+3) COMPARACION BYTE A BYTE contra GestorDataset ver (1000 puntos)
+   Comando: java -cp src GestorDataset ver datos/datos.bin 0 999 > tmp/ver_ref.txt
+   Comando: java -cp src PruebaLector datos/datos.bin {0,1,2} 400 > tmp/ver_lector.txt
+   Comando: fc.exe tmp/ver_ref.txt tmp/ver_lector.txt
+--------------------------------------------------------------
+lineas comparadas: 1000
+Comparando archivos C:\USERS\ADMIN\APPDATA\LOCAL\TEMP\OPENCODE\ver_ref.txt y C:\USERS\ADMIN\APPDATA\LOCAL\TEMP\OPENCODE\VER_LECTOR.TXT
+FC: no se han encontrado diferencias
+
+
+4) DATASET DE VERIFICACION (30 puntos, 2D: x=i, y=i*i)
+   Comando: java -cp src PruebaLector datos/datos_verificacion.bin 0 30
+--------------------------------------------------------------
+=== LectorBloques: datos\datos_verificacion.bin ===
+N = 30  n = 2  puntosPorBloque = 30
+bloques totales = 1  bloque pedido = 0  puntos leidos = 30
+Punto[0] = 0.0, 0.0
+Punto[1] = 1.0, 1.0
+Punto[2] = 2.0, 4.0
+Punto[29] = 29.0, 841.0
+=== fin bloque 0 ===
+5) ULTIMO BLOQUE INCOMPLETO (bloque 2, 400 pts/bloque -> solo 200 restantes)
+   Comando: java -cp src PruebaLector datos/datos.bin 2 400
+--------------------------------------------------------------
+=== LectorBloques: datos\datos.bin ===
+N = 1000  n = 3  puntosPorBloque = 400
+bloques totales = 3  bloque pedido = 2  puntos leidos = 200
+Punto[800] = 66.38463109109864, 79.86452931607748, 59.93837840250521
+Punto[801] = 44.04063290606095, 25.91231420666541, 33.80559040920309
+Punto[998] = 63.127217972201045, 19.091566856365883, 43.25519850640012
+Punto[999] = 97.38842460949797, 58.3729245980027, 59.11976999835373
+=== fin bloque 2 ===
+
+6) PRUEBA OBLIGATORIA: BLOQUE FORZADO DE 50 PUNTOS (N=1000 -> 20 bloques)
+   Comando: java -cp src PruebaLector datos/datos.bin 19 50
+--------------------------------------------------------------
+=== LectorBloques: datos\datos.bin ===
+N = 1000  n = 3  puntosPorBloque = 50
+bloques totales = 20  bloque pedido = 19  puntos leidos = 50
+Punto[950] = 48.44452128894845, 67.21033819387199, 31.62004256483816
+Punto[998] = 63.127217972201045, 19.091566856365883, 43.25519850640012
+Punto[999] = 97.38842460949797, 58.3729245980027, 59.11976999835373
+=== fin bloque 19 ===
+
+7) FALLO TEMPRANO: ARCHIVO CORRUPTO (truncado a 100 bytes)
+   Comando: java -cp src PruebaLector <tmp>/datos_corrupto.bin 0
+   Resultado esperado: IOException en el constructor de LectorBloques
+--------------------------------------------------------------
+Exception in thread "main" java.io.IOException: Archivo corrupto o incompleto: esperado 24008 bytes, real 100 bytes
+	at GestorDataset.validarArchivo(GestorDataset.java:107)
+	at LectorBloques.<init>(LectorBloques.java:54)
+
+8) FALLO TEMPRANO: CABECERA DESCUADRADA (N/n no coinciden)
+   Harness temporal PruebaDescuadre.java (fuera del repo):
+     new LectorBloques(datos.bin, 999, 3, 50)   -> debe lanzar IOException
+     new LectorBloques(datos.bin, 1000, 99, 50) -> debe lanzar IOException
+   Comando: java -cp <tmp>;src PruebaDescuadre
+--------------------------------------------------------------
+EXCEPCION CORRECTA: La cabecera del archivo no coincide con los parametros del llamador: archivo N=1000 n=3 vs esperado N=999 n=3
+EXCEPCION CORRECTA: La cabecera del archivo no coincide con los parametros del llamador: archivo N=1000 n=3 vs esperado N=1000 n=99
+
+NOTAS
+-----
+- La lectura es identica byte a byte a GestorDataset ver (fc sin diferencias).
+- Cada hilo debe abrir su propio LectorBloques (descriptor independiente, regla 1.2/9).
+- La sincronizacion de la version paralela ocurre al pedir pares de bloques,
+  nunca dentro de leerBloque (no hay estado compartido de E/S).
