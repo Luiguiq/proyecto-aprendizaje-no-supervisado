@@ -1,0 +1,17 @@
+# Binarios de datos: solo se versionan los dos chicos
+/datos/*.bin
+!/datos/datos.bin
+!/datos/datos_verificacion.bin
+
+# Compilados
+*.class
+*.jar
+
+# IDE
+.idea/
+*.iml
+.vscode/
+.settings/
+.classpath
+.project
+*.swp
