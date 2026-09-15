@@ -1,0 +1,57 @@
+Participante 3 - ejecuciones reales
+Fecha: 2026-09-15 06:58:48 -05:00
+Entorno: Windows, OpenJDK Temurin 17.0.17; javac --release 17
+MD5 datos/datos.bin y datos/datos_int3_base.bin: d1871098306f974ceabc3467527428bb
+Dataset regenerado con N=1000, n=3, semilla=12345; info: 24008 bytes, Archivo OK
+
+java -cp src Serial datos/datos_verificacion.bin 30 2 1
+archivo=datos/datos_verificacion.bin
+N=30 n=2 puntosPorBloque=1
+pares=435
+d_min=1.4142135623730951 indices=(0,1)
+d_max=841.4998514557207 indices=(0,29)
+tiempo_ms=3.049
+
+java -cp src Serial datos/datos_verificacion.bin 30 2 7
+archivo=datos/datos_verificacion.bin
+N=30 n=2 puntosPorBloque=7
+pares=435
+d_min=1.4142135623730951 indices=(0,1)
+d_max=841.4998514557207 indices=(0,29)
+tiempo_ms=2.109
+
+java -cp src Serial datos/datos_verificacion.bin 30 2 30
+archivo=datos/datos_verificacion.bin
+N=30 n=2 puntosPorBloque=30
+pares=435
+d_min=1.4142135623730951 indices=(0,1)
+d_max=841.4998514557207 indices=(0,29)
+tiempo_ms=2.727
+
+java -cp src Serial datos/datos.bin 1000 3 37
+archivo=datos/datos.bin
+N=1000 n=3 puntosPorBloque=37
+pares=499500
+d_min=0.986065719184471 indices=(429,632)
+d_max=161.08492797311416 indices=(300,721)
+tiempo_ms=15.747
+
+java -cp src Serial datos/datos.bin 1000 3 50
+archivo=datos/datos.bin
+N=1000 n=3 puntosPorBloque=50
+pares=499500
+d_min=0.986065719184471 indices=(429,632)
+d_max=161.08492797311416 indices=(300,721)
+tiempo_ms=12.956
+
+java -cp src Serial datos/datos.bin 1000 3 1000
+archivo=datos/datos.bin
+N=1000 n=3 puntosPorBloque=1000
+pares=499500
+d_min=0.986065719184471 indices=(429,632)
+d_max=161.08492797311416 indices=(300,721)
+tiempo_ms=11.585
+
+Validacion: javac --release 17 -Xlint:all -d src src/*.java pruebas/PruebaSerial.java (sin advertencias)
+java -cp src PruebaSerial
+OK: 87 comprobaciones; verificacion, oraculo, bloques, reduccion y errores.
