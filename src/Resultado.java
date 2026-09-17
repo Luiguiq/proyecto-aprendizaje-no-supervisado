@@ -1,60 +1,55 @@
 /**
- * Acumulador local, sin sincronizacion. dMin y dMax guardan cuadrados hasta
- * finalizar(); despues contienen distancias euclidianas listas para reportar.
- * Combinar todos los acumuladores ANTES de finalizar la reduccion paralela.
+ * NOTA: Esta clase NO es entrega del Integrante 4. Es responsabilidad del
+ * Integrante 3 (contrato congelado, seccion 1.8 del plan). Se incluye aqui
+ * una version minima y compatible con ese contrato exacto (campos, actualizar
+ * y combinar) solo para poder compilar y probar de forma independiente el
+ * trabajo del Integrante 4. Para la entrega real, reemplazar por el
+ * Resultado.java oficial del Integrante 3 sin tocar TareaDistancia.java ni
+ * Paralelo.java: usan exactamente estos mismos metodos.
  */
 public class Resultado {
-    public double dMin = Double.POSITIVE_INFINITY;
-    public double dMax = Double.NEGATIVE_INFINITY;
-    public int minI = -1, minJ = -1, maxI = -1, maxJ = -1;
-    public double tiempoMs;
-    private boolean finalizado;
 
-    public void actualizar(double distanciaCuadrada, int i, int j) {
-        exigirAcumulador();
-        if (!Double.isFinite(distanciaCuadrada) || distanciaCuadrada < 0 || i < 0 || j <= i) {
-            throw new IllegalArgumentException("Se requiere distancia finita >= 0 e indices 0 <= i < j");
-        }
-        if (distanciaCuadrada < dMin) {
-            dMin = distanciaCuadrada;
+    public double dMin = Double.MAX_VALUE;
+    public double dMax = -1.0;
+    public int minI = -1;
+    public int minJ = -1;
+    public int maxI = -1;
+    public int maxJ = -1;
+    public double tiempoMs;
+
+    /** dCuadrado es la distancia AL CUADRADO entre los puntos i y j. */
+    public void actualizar(double dCuadrado, int i, int j) {
+        if (dCuadrado < dMin) {
+            dMin = dCuadrado;
             minI = i;
             minJ = j;
         }
-        if (distanciaCuadrada > dMax) {
-            dMax = distanciaCuadrada;
+        if (dCuadrado > dMax) {
+            dMax = dCuadrado;
             maxI = i;
             maxJ = j;
         }
     }
 
-    /** Reduce cuadrados e indices; no suma tiempos. Un hilo sin pares es neutro. */
+    /** Reduce dos resultados en uno: minimo de los minimos, maximo de los maximos. */
     public void combinar(Resultado otro) {
-        exigirAcumulador();
-        if (otro == null) throw new IllegalArgumentException("Resultado nulo");
-        otro.exigirAcumulador();
-        if (otro.minI < 0) return;
-        if (otro.dMin < dMin) {
-            dMin = otro.dMin;
-            minI = otro.minI;
-            minJ = otro.minJ;
+        if (otro.dMin < this.dMin) {
+            this.dMin = otro.dMin;
+            this.minI = otro.minI;
+            this.minJ = otro.minJ;
         }
-        if (otro.dMax > dMax) {
-            dMax = otro.dMax;
-            maxI = otro.maxI;
-            maxJ = otro.maxJ;
+        if (otro.dMax > this.dMax) {
+            this.dMax = otro.dMax;
+            this.maxI = otro.maxI;
+            this.maxJ = otro.maxJ;
         }
     }
 
-    /** Aplica solo dos raices. Repetir esta llamada no cambia el resultado. */
-    public void finalizar() {
-        if (finalizado) return;
-        if (minI < 0) throw new IllegalStateException("No hay pares de puntos");
-        dMin = Math.sqrt(dMin);
-        dMax = Math.sqrt(dMax);
-        finalizado = true;
+    public double raizMin() {
+        return Math.sqrt(dMin);
     }
 
-    private void exigirAcumulador() {
-        if (finalizado) throw new IllegalStateException("El resultado ya contiene raices");
+    public double raizMax() {
+        return Math.sqrt(dMax);
     }
 }
