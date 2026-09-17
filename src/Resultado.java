@@ -1,3 +1,4 @@
+
 /**
  * NOTA: Esta clase NO es entrega del Integrante 4. Es responsabilidad del
  * Integrante 3 (contrato congelado, seccion 1.8 del plan). Se incluye aqui
@@ -17,7 +18,9 @@ public class Resultado {
     public int maxJ = -1;
     public double tiempoMs;
 
-    /** dCuadrado es la distancia AL CUADRADO entre los puntos i y j. */
+    /**
+     * dCuadrado es la distancia AL CUADRADO entre los puntos i y j.
+     */
     public void actualizar(double dCuadrado, int i, int j) {
         if (dCuadrado < dMin) {
             dMin = dCuadrado;
@@ -31,7 +34,10 @@ public class Resultado {
         }
     }
 
-    /** Reduce dos resultados en uno: minimo de los minimos, maximo de los maximos. */
+    /**
+     * Reduce dos resultados en uno: minimo de los minimos, maximo de los
+     * maximos.
+     */
     public void combinar(Resultado otro) {
         if (otro.dMin < this.dMin) {
             this.dMin = otro.dMin;
@@ -51,5 +57,14 @@ public class Resultado {
 
     public double raizMax() {
         return Math.sqrt(dMax);
+    }
+
+    public void finalizar() {
+        if (dMin != Double.MAX_VALUE) {
+            dMin = Math.sqrt(dMin);
+        }
+        if (dMax != -1.0) {
+            dMax = Math.sqrt(dMax);
+        }
     }
 }
