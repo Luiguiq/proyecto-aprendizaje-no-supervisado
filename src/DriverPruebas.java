@@ -45,6 +45,24 @@ public class DriverPruebas {
         new File("pruebas").mkdirs();
         new File("evidencia").mkdirs();
 
+        File dirDatos = new File("datos");
+        File[] candidatos = dirDatos.listFiles();
+        boolean hayDatasets = false;
+        if (candidatos != null) {
+            for (File c : candidatos) {
+                String nombre = c.getName();
+                if (nombre.startsWith("datos_N") && nombre.endsWith(".bin")) {
+                    hayDatasets = true;
+                    break;
+                }
+            }
+        }
+        if (!hayDatasets) {
+            System.err.println("No hay datasets datos_N*_n*.bin en datos/.");
+            System.err.println("Genere los 13 con pruebas/generar_datasets.bat y vuelva a ejecutar.");
+            return;
+        }
+
         File csvFile = new File("pruebas/resultados.csv");
         File evidenciaFile = new File("evidencia/verificacion_igualdad.txt");
 
@@ -78,7 +96,11 @@ public class DriverPruebas {
                 double dMinSerial = resSerial.dMin;
                 double dMaxSerial = resSerial.dMax;
 
-                // Escribir Serial en CSV (representado como T=1 serial en el registro)
+                // Escribir Serial en CSV (representado como T=1 serial en el registro).
+                // Nota: por cada configuracion hay DOS filas T=1. La PRIMERA (esta) es
+                // el serial de referencia; la SEGUNDA la escribe el bucle paralelo con
+                // 1 hilo. Las graficas de speedup usan esta (el serial) como baseline,
+                // por eso S(1)=1 por construccion. Columnas congeladas en la Seccion 8.
                 escribirFila(csvWriter, N, n, 1, bloque, resSerial.tiempoMs,
                         dMinSerial, dMaxSerial, resSerial.minI, resSerial.minJ, resSerial.maxI, resSerial.maxJ);
 
@@ -113,22 +135,28 @@ public class DriverPruebas {
             }
 
             // 2. PRUEBA OBLIGATORIA CON BLOQUE FORZADO (Seccion 7 y Seccion 1.10)
-            System.out.println("\n--> Ejecutando PRUEBA OBLIGATORIA CON BLOQUE FORZADO (N=1000, n=3, bloque=50)...");
             int nForzado = 3;
             int NForzado = 1000;
             int bloqueForzado = 50;
             String rutaForzada = "datos/datos_N1000_n3.bin";
 
-            Resultado resSerialForzado = Serial.ejecutar(rutaForzada, NForzado, nForzado, bloqueForzado);
-            escribirFila(csvWriter, NForzado, nForzado, 1, bloqueForzado, resSerialForzado.tiempoMs,
-                    resSerialForzado.dMin, resSerialForzado.dMax,
-                    resSerialForzado.minI, resSerialForzado.minJ, resSerialForzado.maxI, resSerialForzado.maxJ);
+            if (!new File(rutaForzada).exists()) {
+                System.err.println("Archivo no encontrado: " + rutaForzada
+                        + ". Se omite la prueba obligatoria (genere los datasets con pruebas/generar_datasets.bat).");
+            } else {
+                System.out.println("\n--> Ejecutando PRUEBA OBLIGATORIA CON BLOQUE FORZADO (N=1000, n=3, bloque=50)...");
 
-            for (int T : hilos) {
-                Resultado resParForzado = Paralelo.ejecutar(rutaForzada, NForzado, nForzado, bloqueForzado, T, false);
-                escribirFila(csvWriter, NForzado, nForzado, T, bloqueForzado, resParForzado.tiempoMs,
-                        resParForzado.raizMin(), resParForzado.raizMax(),
-                        resParForzado.minI, resParForzado.minJ, resParForzado.maxI, resParForzado.maxJ);
+                Resultado resSerialForzado = Serial.ejecutar(rutaForzada, NForzado, nForzado, bloqueForzado);
+                escribirFila(csvWriter, NForzado, nForzado, 1, bloqueForzado, resSerialForzado.tiempoMs,
+                        resSerialForzado.dMin, resSerialForzado.dMax,
+                        resSerialForzado.minI, resSerialForzado.minJ, resSerialForzado.maxI, resSerialForzado.maxJ);
+
+                for (int T : hilos) {
+                    Resultado resParForzado = Paralelo.ejecutar(rutaForzada, NForzado, nForzado, bloqueForzado, T, false);
+                    escribirFila(csvWriter, NForzado, nForzado, T, bloqueForzado, resParForzado.tiempoMs,
+                            resParForzado.raizMin(), resParForzado.raizMax(),
+                            resParForzado.minI, resParForzado.minJ, resParForzado.maxI, resParForzado.maxJ);
+                }
             }
 
             System.out.println("\n[OK] Bateria de pruebas finalizada exitosamente.");

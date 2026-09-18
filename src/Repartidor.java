@@ -24,7 +24,12 @@ public class Repartidor {
             throw new IllegalArgumentException("totalBloques debe ser mayor que 0");
         }
         this.totalBloques = totalBloques;
-        this.totalPares = totalBloques * (totalBloques + 1) / 2;
+        long pares = (long) totalBloques * (totalBloques + 1) / 2;
+        if (pares > Integer.MAX_VALUE) {
+            throw new IllegalArgumentException("Demasiados pares triangulares: " + pares
+                    + "; aumente puntosPorBloque o reduzca N");
+        }
+        this.totalPares = (int) pares;
         this.listaBi = new int[totalPares];
         this.listaBj = new int[totalPares];
 
