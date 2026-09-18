@@ -14,18 +14,25 @@ public class LectorBloques {
 
     // Constructor esperado por Serial y PruebaLector
     public LectorBloques(String ruta, int N, int n, int puntosPorBloque) throws IOException {
-        this.raf = new RandomAccessFile(ruta, "r");
-        int[] cabecera = GestorDataset.leerCabecera(raf);
-        this.N = cabecera[0];
-        this.n = cabecera[1];
-        GestorDataset.validarArchivo(raf, this.N, this.n);
-
-        if (this.N != N || this.n != n) {
-            raf.close();
-            throw new IllegalArgumentException(
-                    "Parametros no coinciden con la cabecera: esperado N=" + N + " n=" + n
-                    + ", real N=" + this.N + " n=" + this.n);
+        RandomAccessFile archivo = new RandomAccessFile(ruta, "r");
+        try {
+            int[] cabecera = GestorDataset.leerCabecera(archivo);
+            this.N = cabecera[0];
+            this.n = cabecera[1];
+            GestorDataset.validarArchivo(archivo, this.N, this.n);
+            if (this.N != N || this.n != n) {
+                throw new IllegalArgumentException(
+                        "Parametros no coinciden con la cabecera: esperado N=" + N + " n=" + n
+                        + ", real N=" + this.N + " n=" + this.n);
+            }
+        } catch (IOException e) {
+            try { archivo.close(); } catch (IOException ignorada) { }
+            throw e;
+        } catch (RuntimeException e) {
+            try { archivo.close(); } catch (IOException ignorada) { }
+            throw e;
         }
+        this.raf = archivo;
         this.puntosPorBloque = puntosPorBloque;
     }
 

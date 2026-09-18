@@ -90,7 +90,7 @@ public class GeneradorGraficas {
             }
         }
         g.dispose();
-        guardar(img, "graficas/tiempo_vs_dimension_n.png");
+        guardar(img, "graficas/tiempo_vs_N.png");
     }
 
     // 2. speedup_vs_T.png
@@ -183,7 +183,7 @@ public class GeneradorGraficas {
         guardar(img, "graficas/eficiencia_vs_T.png");
     }
 
-    // 4. tiempo_vs_n.png
+    // 4. tiempo_vs_dimension_n.png
     private static void crearTiempoVsDim(Registro[] datos) {
         int w = 800, h = 500;
         BufferedImage img = new BufferedImage(w, h, BufferedImage.TYPE_INT_RGB);
@@ -217,7 +217,7 @@ public class GeneradorGraficas {
             prevY = py;
         }
         g.dispose();
-        guardar(img, "graficas/tiempo_vs_n.png");
+        guardar(img, "graficas/tiempo_vs_dimension_n.png");
     }
 
     private static double getTiempo(Registro[] datos, int N, int n, int T, boolean forzado) {

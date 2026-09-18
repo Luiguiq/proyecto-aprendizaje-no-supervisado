@@ -1,5 +1,4 @@
 import java.io.IOException;
-import java.io.RandomAccessFile;
 
 /**
  * Integrante 2 - Main de depuracion de LectorBloques.
@@ -24,10 +23,7 @@ public class PruebaLector {
         int numBloque   = (args.length >= 2) ? Integer.parseInt(args[1]) : 0;
         int puntosMax   = (args.length >= 3) ? Integer.parseInt(args[2]) : 0;
 
-        int[] cab;
-        try (RandomAccessFile tmp = new RandomAccessFile(archivo, "r")) {
-            cab = GestorDataset.leerCabecera(tmp);
-        }
+        int[] cab = GestorDataset.leerCabecera(archivo);
         int N = cab[0];
         int n = cab[1];
         if (puntosMax <= 0) {

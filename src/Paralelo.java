@@ -13,6 +13,8 @@
  * Ejemplo (prueba obligatoria con bloque forzado, seccion 7 del plan):
  *   java -cp src Paralelo datos/datos.bin 1000 3 50 4
  */
+import java.util.Locale;
+
 public class Paralelo {
 
     public static void main(String[] args) throws Exception {
@@ -28,9 +30,9 @@ public class Paralelo {
 
         Resultado global = ejecutar(archivo, N, n, puntosPorBloque, T, true);
 
-        System.out.printf("d_min=%.6f (i=%d, j=%d)%n", global.raizMin(), global.minI, global.minJ);
-        System.out.printf("d_max=%.6f (i=%d, j=%d)%n", global.raizMax(), global.maxI, global.maxJ);
-        System.out.printf("tiempo_ms=%.3f%n", global.tiempoMs);
+        System.out.printf(Locale.ROOT, "d_min=%.6f (i=%d, j=%d)%n", global.raizMin(), global.minI, global.minJ);
+        System.out.printf(Locale.ROOT, "d_max=%.6f (i=%d, j=%d)%n", global.raizMax(), global.maxI, global.maxJ);
+        System.out.printf(Locale.ROOT, "tiempo_ms=%.3f%n", global.tiempoMs);
     }
 
     /**

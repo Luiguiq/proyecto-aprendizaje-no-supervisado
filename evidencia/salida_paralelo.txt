@@ -1,0 +1,53 @@
+﻿=== SALIDA PARALELO - Prueba obligatoria bloque forzado 50 (N=1000, n=3) ===
+
+--- T = 1 ---
+=== Paralelo ===
+archivo=datos/datos.bin N=1000 n=3 puntosPorBloque=50 T=1
+totalBloques=20 totalPares=210
+hilo[0].paresProcesados=210
+sumaParesProcesados=210 (coincide con totalPares)
+d_min=0.986066 (i=429, j=632)
+d_max=161.084928 (i=300, j=721)
+tiempo_ms=10.270
+
+--- T = 2 ---
+=== Paralelo ===
+archivo=datos/datos.bin N=1000 n=3 puntosPorBloque=50 T=2
+totalBloques=20 totalPares=210
+hilo[0].paresProcesados=105
+hilo[1].paresProcesados=105
+sumaParesProcesados=210 (coincide con totalPares)
+d_min=0.986066 (i=429, j=632)
+d_max=161.084928 (i=300, j=721)
+tiempo_ms=18.387
+
+--- T = 4 ---
+=== Paralelo ===
+archivo=datos/datos.bin N=1000 n=3 puntosPorBloque=50 T=4
+totalBloques=20 totalPares=210
+hilo[0].paresProcesados=57
+hilo[1].paresProcesados=51
+hilo[2].paresProcesados=52
+hilo[3].paresProcesados=50
+sumaParesProcesados=210 (coincide con totalPares)
+d_min=0.986066 (i=429, j=632)
+d_max=161.084928 (i=300, j=721)
+tiempo_ms=25.370
+
+--- T = 8 ---
+=== Paralelo ===
+archivo=datos/datos.bin N=1000 n=3 puntosPorBloque=50 T=8
+totalBloques=20 totalPares=210
+hilo[0].paresProcesados=28
+hilo[1].paresProcesados=23
+hilo[2].paresProcesados=28
+hilo[3].paresProcesados=27
+hilo[4].paresProcesados=26
+hilo[5].paresProcesados=25
+hilo[6].paresProcesados=24
+hilo[7].paresProcesados=29
+sumaParesProcesados=210 (coincide con totalPares)
+d_min=0.986066 (i=429, j=632)
+d_max=161.084928 (i=300, j=721)
+tiempo_ms=33.791
+
